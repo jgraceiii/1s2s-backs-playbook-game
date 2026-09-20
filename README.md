@@ -1,4 +1,4 @@
-# Marshwood 1/2s Backs Playbook
+# 1/2s Backs Playbook
 
 Formations, huddle spots, plays and a quiz for our 1st and 2nd grade backs.
 
