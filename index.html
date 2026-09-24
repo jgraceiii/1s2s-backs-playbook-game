@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1/2s Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2fb;
+    --card: #ffffff;
+    --ink: #1a1326;
+    --muted: #6a6280;
+    --line: #e3dcf1;
+    --tint: #ede7fb;
+    --purple: #5b21b6;
+    --purple-d: #2e1065;
+    --green: #22d65a;
+    --green-d: #0c7a35;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e0918; --card: #181123; --ink: #f2eefb; --muted: #a99fc0;
+      --line: #31264a; --tint: #2a1d47;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e0918; --card: #181123; --ink: #f2eefb; --muted: #a99fc0;
+    --line: #31264a; --tint: #2a1d47;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+
+  /* Header */
+  .hero {
+    background: linear-gradient(135deg, #2e1065 0%, #5b21b6 65%, #6d28d9 100%);
+    color: #fff;
+    padding: 18px 0 20px;
+    border-bottom: 6px solid var(--green);
+  }
+  .hero-in { display: flex; align-items: center; gap: 14px; }
+  .hero svg { width: 54px; height: 54px; flex: none; }
+  h1 {
+    font-family: 'Oswald', Impact, 'Arial Narrow', sans-serif;
+    font-weight: 700; font-size: clamp(26px, 5.6vw, 44px);
+    margin: 0; line-height: 1.05; letter-spacing: .5px;
+  }
+  .sub { margin: 2px 0 0; font-size: 15px; color: #d9ccf5; font-weight: 700; }
+
+  /* Controls */
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin: 16px 0 10px; }
+  .seg { display: inline-flex; border: 2px solid var(--purple); border-radius: 14px; overflow: hidden; }
+  .segbtn, .btn, .switch, .replay, .next, .bigbtn, .speak {
+    font-family: inherit; font-weight: 800; font-size: 17px; color: var(--ink);
+    cursor: pointer; touch-action: manipulation; min-height: 50px;
+  }
+  .segbtn { border: 0; background: var(--card); padding: 0 16px; }
+  .segbtn[aria-pressed="true"] { background: var(--purple); color: #fff; }
+  .segbtn + .segbtn { border-left: 2px solid var(--line); }
+  .switch {
+    display: inline-flex; align-items: center; gap: 10px; padding: 0 16px;
+    border: 2px solid var(--line); background: var(--card); border-radius: 14px;
+  }
+  .switch .dot { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--muted); background: transparent; }
+  .switch[aria-pressed="true"] { border-color: var(--green-d); }
+  .switch[aria-pressed="true"] .dot { background: var(--green); border-color: var(--green-d); }
+
+  .tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0 0 12px; }
+  .btn {
+    border: 2px solid var(--line); background: var(--card); border-radius: 14px;
+    padding: 8px 10px; min-height: 56px;
+  }
+  .btn small { display: block; font-size: 13px; color: var(--muted); font-weight: 700; }
+  .btn[aria-pressed="true"] {
+    background: var(--purple); border-color: var(--purple-d); color: #fff;
+    box-shadow: 0 5px 0 var(--green);
+    transform: translateY(-2px);
+  }
+  .btn[aria-pressed="true"] small { color: #d9ccf5; }
+  button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--green); outline-offset: 2px; }
+
+  /* Cards */
+  .card {
+    background: var(--card); border: 2px solid var(--line); border-radius: 20px;
+    padding: 16px; margin: 0 0 16px;
+  }
+  .callhead { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  h2 {
+    font-family: 'Oswald', Impact, 'Arial Narrow', sans-serif; font-weight: 700;
+    font-size: clamp(28px, 5.5vw, 40px); margin: 0; line-height: 1.1; color: var(--ink);
+  }
+  h3 { font-family: 'Oswald', Impact, sans-serif; font-weight: 700; font-size: 26px; margin: 0 0 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+  .chip {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--tint); border-radius: 12px; padding: 6px 14px; min-width: 64px;
+  }
+  .chip b { font-family: 'Oswald', Impact, sans-serif; font-size: 28px; line-height: 1.1; color: var(--purple); }
+  :root[data-theme="dark"] .chip b { color: #c4b0f5; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip b { color: #c4b0f5; } }
+  .chip.word b { font-size: 22px; padding-top: 3px; }
+  .chip i { font-style: normal; font-size: 12px; color: var(--muted); font-weight: 800; }
+  .pill { background: var(--tint); border-radius: 999px; padding: 8px 16px; font-weight: 800; font-size: 16px; }
+  .replay {
+    border: 2px solid var(--green-d); background: var(--green); color: #06260f;
+    border-radius: 14px; padding: 0 18px;
+  }
+
+  .field { border: 4px solid var(--purple); border-radius: 14px; overflow: hidden; background: #fbfaff; line-height: 0; }
+  .field svg, .mini svg { width: 100%; height: auto; display: block; }
+  .qfield { width: min(100%, max(360px, calc((100vh - 340px) * 1.29))); margin: 0 auto; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 12px; font-size: 15px; font-weight: 800; color: var(--muted); }
+  .lg { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* Assignments */
+  .asg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+  .asg { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--tint); }
+  .asg.ball { background: var(--green); color: #06260f; }
+  .asg p { margin: 0; font-size: 17px; line-height: 1.25; }
+  .asg p b { display: block; font-size: 18px; font-weight: 900; }
+  .asg .muted { color: var(--muted); }
+  .num {
+    flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+    font-family: 'Oswald', Impact, sans-serif; font-weight: 700; font-size: 20px;
+  }
+  .num.back { background: #6d28d9; color: #fff; border: 3px solid var(--purple-d); }
+  .num.end { background: #fff; color: #17111f; border: 3px solid #17111f; font-size: 15px; }
+  .num.line { background: #d8d4e3; color: #17111f; border: 3px solid #2b2536; }
+  .num.big { width: 68px; height: 68px; font-size: 36px; }
+
+  /* All 12 */
+  .fgroup { margin: 0 0 22px; }
+  .row3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .mini {
+    font-family: inherit; text-align: left; cursor: pointer; touch-action: manipulation;
+    background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 16px; padding: 10px;
+  }
+  .mini:hover { border-color: var(--purple); }
+  .mini .mt { display: block; font-family: 'Oswald', Impact, sans-serif; font-weight: 700; font-size: 22px; margin-bottom: 6px; }
+  .mini .fieldwrap { display: block; border: 3px solid var(--purple); border-radius: 10px; overflow: hidden; line-height: 0; }
+
+  /* Huddle info */
+  .hinfo { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 10px 14px; border-radius: 14px; background: var(--tint); min-height: 66px; }
+  .hinfo p { margin: 0; font-size: 18px; line-height: 1.25; }
+  .hinfo p b { display: block; font-size: 20px; font-weight: 900; }
+  svg [data-act] { cursor: pointer; }
+
+  /* Route animation */
+  .rt { fill: none; stroke-linejoin: round; stroke-dasharray: 1 1; stroke-dashoffset: 1;
+        animation: draw var(--dur, 1s) cubic-bezier(.3,.6,.4,1) forwards; animation-delay: var(--delay, 0s); }
+  .endcap { opacity: 0; animation: pop .25s ease-out forwards; animation-delay: var(--cd, 1s); }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes pop { to { opacity: 1; } }
+  svg.static .rt { animation: none; stroke-dashoffset: 0; }
+  svg.static .endcap { animation: none; opacity: 1; }
+
+  /* Level selector */
+  .levels { border: 2px solid var(--line); border-radius: 18px; background: var(--card); padding: 6px 12px 12px; margin: 16px 0 0; min-width: 0; }
+  .levels legend { font-weight: 900; font-size: 15px; color: var(--muted); padding: 0 8px; }
+  .lvlrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 760px) { .lvlrow { grid-template-columns: 1fr; } }
+  .lvl { display: flex; align-items: center; gap: 12px; border: 3px solid var(--line); border-radius: 14px; padding: 10px 14px; cursor: pointer; min-height: 64px; background: var(--card); touch-action: manipulation; }
+  .lvl.on { border-color: var(--purple); background: var(--tint); }
+  .lvl input { width: 26px; height: 26px; accent-color: var(--purple); flex: none; margin: 0; }
+  .lvl b { display: block; font-size: 19px; font-weight: 900; }
+  .lvl small { display: block; font-size: 14px; color: var(--muted); font-weight: 700; line-height: 1.2; }
+  .lvl:focus-within { outline: 4px solid var(--green); outline-offset: 2px; }
+  .fade { opacity: 0; animation: pop .3s ease-out forwards; animation-delay: var(--cd, .6s); }
+  svg.static .fade { animation: none; opacity: 1; }
+  .you .num.end { background: #fff; color: #17111f; border-color: var(--green); font-size: 17px; }
+  .spacer { height: 24px; }
+
+  /* ---------- Quiz ---------- */
+  .meter {
+    display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 10px 14px;
+    background: var(--card); border: 2px solid var(--line); border-radius: 18px;
+  }
+  .segs { flex: 1; display: flex; gap: 6px; }
+  .mseg { flex: 1; height: 28px; border-radius: 8px; background: var(--tint); border: 2px solid var(--line); }
+  .mseg.on { background: var(--green); border-color: var(--green-d); }
+  .mseg.new { animation: segpop .55s ease-out; }
+  @keyframes segpop { 0% { transform: scale(.3); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .meter.full .mseg.on { animation: wave .7s ease-in-out infinite; animation-delay: calc(var(--i) * 70ms); }
+  @keyframes wave { 50% { transform: translateY(-7px); } }
+  .mcount { font-family: 'Oswald', Impact, sans-serif; font-weight: 700; font-size: 22px; min-width: 58px; text-align: right; }
+  .prize { line-height: 0; }
+
+  .qhead {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px;
+    background: linear-gradient(135deg, #2e1065, #5b21b6); color: #fff;
+    border-radius: 16px; padding: 12px 16px; border-bottom: 5px solid var(--green);
+  }
+  .qmain { font-family: 'Oswald', Impact, 'Arial Narrow', sans-serif; font-weight: 700; font-size: clamp(28px, 6vw, 44px); line-height: 1.1; }
+  .digs { display: inline-flex; gap: 3px; margin: 0 4px; }
+  .dig { display: inline-block; min-width: 1.05ch; padding: 0 7px; border-radius: 9px; background: rgba(255,255,255,.16); text-align: center; }
+  .dig.hl { background: var(--green); color: #06260f; }
+  .you { display: inline-flex; align-items: center; gap: 8px; font-family: 'Oswald', Impact, sans-serif; font-size: 22px; font-weight: 700; }
+  .you .num { width: 50px; height: 50px; font-size: 26px; background: #7c3aed; border: 3px solid var(--green); color: #fff; }
+  .qask { margin-left: auto; display: flex; align-items: center; gap: 10px; font-size: clamp(19px, 3.6vw, 26px); font-weight: 900; }
+  .speak { width: 50px; height: 50px; min-height: 50px; border-radius: 50%; border: 0; background: #fff; color: var(--purple-d); display: grid; place-items: center; }
+
+  .fb {
+    display: flex; align-items: center; gap: 12px; min-height: 84px; margin: 12px 0;
+    padding: 10px 14px; border-radius: 16px; background: var(--tint); color: var(--muted);
+    font-size: 20px; font-weight: 800;
+  }
+  .fb.idle { justify-content: center; }
+  .fb.ok { background: var(--green); color: #06260f; }
+  .fb.bad { background: #2b2536; color: #fff; }
+  .fbicon { flex: none; line-height: 0; }
+  .fbtxt { flex: 1; line-height: 1.2; }
+  .fbtxt b { display: block; font-family: 'Oswald', Impact, sans-serif; font-size: 28px; font-weight: 700; }
+  .fbtxt span { font-size: 17px; font-weight: 700; }
+  .next {
+    flex: none; min-height: 60px; padding: 0 30px; border-radius: 16px; border: 3px solid #fff;
+    background: var(--purple); color: #fff; font-size: 22px; font-weight: 900;
+    animation: nudge 1.6s ease-in-out infinite;
+  }
+  @keyframes nudge { 50% { transform: translateX(4px); } }
+
+  .bigrow { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+  .bigbtn {
+    flex: 1 1 170px; min-height: 92px; border-radius: 18px; border: 3px solid var(--line); background: var(--card);
+    display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 24px; font-weight: 900; padding: 8px 14px;
+  }
+  .bigbtn.ok { background: var(--green); border-color: var(--green-d); color: #06260f; }
+  .bigbtn.bad { background: #2b2536; border-color: #000; color: #fff; }
+
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 4px; }
+  .cardbtn { padding: 6px; border-radius: 16px; border: 4px solid var(--line); background: var(--card); cursor: pointer; line-height: 0; touch-action: manipulation; }
+  .cardbtn svg { width: 100%; height: auto; display: block; border-radius: 10px; }
+  .cardbtn.ok { border-color: var(--green-d); background: var(--green); }
+  .cardbtn.bad { border-color: #111; background: #2b2536; opacity: .8; }
+  .bigpic { width: min(100%, 640px); margin: 0 auto; }
+
+  svg .blink { animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .5; } }
+  svg [data-choice] { cursor: pointer; }
+  svg [data-choice]:focus { outline: none; }
+  svg [data-choice]:focus-visible .rc { stroke: #22d65a; stroke-width: 5; }
+
+  /* Celebration */
+  .win {
+    position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; overflow: hidden;
+    background: radial-gradient(circle at 50% 35%, #7c3aed, #2e1065 75%);
+    padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    animation: winin .35s ease-out;
+  }
+  @keyframes winin { from { opacity: 0; } }
+  .confetti i { position: absolute; top: -30px; border-radius: 3px; animation: fall linear infinite; }
+  @keyframes fall { to { transform: translateY(115vh) rotate(720deg); } }
+  .winbox { position: relative; text-align: center; color: #fff; }
+  .td { font-family: 'Oswald', Impact, sans-serif; font-weight: 700; font-size: clamp(48px, 14vw, 120px); line-height: 1; letter-spacing: 2px; animation: tdpop .8s cubic-bezier(.2,1.6,.4,1) both; }
+  @keyframes tdpop { from { transform: scale(.2); opacity: 0; } }
+  .candies { display: flex; justify-content: center; gap: 16px; margin: 20px 0 10px; }
+  .candies svg { animation: hop 1s ease-in-out infinite; }
+  .candies svg:nth-child(2) { animation-delay: .15s; }
+  .candies svg:nth-child(3) { animation-delay: .3s; }
+  @keyframes hop { 50% { transform: translateY(-24px) rotate(8deg); } }
+  .askcoach { font-family: 'Oswald', Impact, sans-serif; font-size: clamp(28px, 6.5vw, 52px); font-weight: 700; color: var(--green); margin: 6px 0 22px; animation: tdpop .8s .5s cubic-bezier(.2,1.6,.4,1) both; }
+  .winbox .next { animation: none; }
+  .flyball { position: absolute; top: 9%; left: -110px; animation: fly 2.4s ease-in-out .3s both; }
+  @keyframes fly {
+    0% { transform: translate(0, 0) rotate(0); }
+    50% { transform: translate(55vw, -6vh) rotate(540deg); }
+    100% { transform: translate(120vw, 8vh) rotate(1080deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rt { animation: none; stroke-dashoffset: 0; }
+    .endcap { animation: none; opacity: 1; }
+    svg .blink, .next, .mseg.new, .meter.full .mseg.on, .candies svg, .flyball, .confetti i { animation: none; }
+    .fade { animation: none; opacity: 1; }
+    .td, .askcoach { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-35 32 32)"><ellipse cx="32" cy="32" rx="28" ry="16" fill="#7c3aed" stroke="#fff" stroke-width="3"/><path d="M18 32h28M26 26v12M32 26v12M38 26v12" stroke="#22d65a" stroke-width="3" stroke-linecap="round"/></g></svg>
+    <div>
+      <h1>1/2s Playbook</h1>
+      <p class="sub">Huddle, formations, plays and a quiz for our 1st and 2nd graders</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div class="spacer"></div>
+
+<script>
+/* ---------- Settings you may want to change ---------- */
+const METER_GOAL = 10;                              // right answers needed to fill the meter
+const PRIZE_TEXT = 'Ask Coach for a candy corn!';  // shown when the meter is full
+
+/* ---------- Field geometry (SVG units) ---------- */
+const CX = 400;          // center of the ball
+const LOS = 380;         // line of scrimmage (y)
+const FH = 620;          // field height
+const TD_Y = 62;         // arrow tip inside the end zone
+const HR_Y = LOS - 64;   // row for tappable hole rings in the quiz
+const FB_DEPTH = 100;    // 5 yards off the line of scrimmage
+
+const FORM = {
+  brown:         { name: 'Brown',           te: 'R', se: 'L', type: 'brown', family: 'brown' },
+  brownOver:     { name: 'Brown Over',      te: 'R', se: 'R', type: 'brown', family: 'brownOver' },
+  leftBrown:     { name: 'Left Brown',      te: 'L', se: 'R', type: 'brown', family: 'leftBrown' },
+  leftBrownOver: { name: 'Left Brown Over', te: 'L', se: 'L', type: 'brown', family: 'leftBrownOver' },
+  twinsL:        { name: 'Twins Left',      te: 'R', se: 'L', type: 'twins', family: 'twins' },
+  twinsR:        { name: 'Twins Right',     te: 'L', se: 'R', type: 'twins', family: 'twins' }
+};
+const FAMS = [
+  { key: 'brown', name: 'Brown' }, { key: 'brownOver', name: 'Brown Over' },
+  { key: 'leftBrown', name: 'Left Brown' }, { key: 'leftBrownOver', name: 'Left Brown Over' },
+  { key: 'twins', name: 'Twins' }
+];
+const BROWN_FORMS = ['brown', 'brownOver', 'leftBrown', 'leftBrownOver'];
+
+const PLAYS = {
+  diveS:    { name: 'Dive',    lvl: 1, type: 'run' },
+  diveW:    { name: 'Dive',    lvl: 1, type: 'run' },
+  sweep:    { name: 'Sweep',   lvl: 1, type: 'run' },   // shown in the call title without a play name
+  keep:     { name: 'QB Keep', lvl: 2, type: 'run' },
+  boot:     { name: 'QB Boot', lvl: 2, type: 'run' },
+  reverse:  { name: 'Reverse', lvl: 2, type: 'run' },
+  dump:     { name: 'TE Dump', lvl: 3, type: 'pass' },
+  screen:   { name: '0 Screen', lvl: 3, type: 'pass' },
+  screenTw: { name: 'Screen',  lvl: 3, type: 'pass' }
+};
+const LEVELS = [
+  { v: 1, name: 'Beginner', desc: 'Dive and Sweep only' },
+  { v: 2, name: 'Intermediate',        desc: 'Adds QB Keep, Boot, Reverse' },
+  { v: 3, name: 'Advanced',            desc: 'Adds passes. The whole playbook' }
+];
+
+const state = { view: 'one', mode: 1, f: 'brown', p: 'diveS', holes: true, hpick: null };
+
+/* ---------- Small helpers ---------- */
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sideWord = v => v > 0 ? 'right' : 'left';
+const seal = (x, hx) => x > hx + 2 ? 1 : -1;   // blockers right of the hole seal right, left of it seal left
+
+/* ---------- What is available at the chosen level ---------- */
+function playsFor(fKey, lvl) {
+  const f = FORM[fKey];
+  if (f.type === 'twins') return lvl >= 3 ? ['screenTw'] : [];
+  const s = f.te === 'R' ? 1 : -1;
+  const order = s === 1 ? ['diveS', 'diveW', 'sweep', 'keep', 'boot', 'reverse', 'dump', 'screen']
+                        : ['diveW', 'diveS', 'sweep', 'keep', 'boot', 'reverse', 'dump', 'screen'];
+  return order.filter(p => PLAYS[p].lvl <= lvl);
+}
+function availForms() { return state.mode >= 3 ? BROWN_FORMS.concat(['twinsL', 'twinsR']) : BROWN_FORMS.slice(); }
+function availPlays() {
+  const out = [];
+  availForms().forEach(f => playsFor(f, state.mode).forEach(p => out.push({ f, p })));
+  return out;
+}
+function availFams() { return FAMS.filter(x => x.key !== 'twins' || state.mode >= 3); }
+function playButtons(fam) {
+  if (fam === 'twins') return [{ f: 'twinsL', p: 'screenTw', label: 'Left Screen', small: 'Pass' },
+                               { f: 'twinsR', p: 'screenTw', label: 'Right Screen', small: 'Pass' }];
+  return playsFor(fam, state.mode).map(p => ({ f: fam, p, label: PLAYS[p].name, small: callInfo(fam, p).code || 'Pass' }));
+}
+
+/* ---------- Play call info (light, no routes) ---------- */
+function callInfo(fKey, pKey) {
+  const f = FORM[fKey], s = f.te === 'R' ? 1 : -1, pl = PLAYS[pKey];
+  let code = '';
+  if (pKey === 'diveS') code = '23' + (s === 1 ? 0 : 1);
+  else if (pKey === 'diveW') code = '23' + (s === 1 ? 1 : 0);
+  else if (['sweep', 'keep', 'boot', 'reverse'].includes(pKey)) code = s === 1 ? '248' : '229';
+  const NO_NAME = ['sweep', 'diveS', 'diveW'];
+  const parts = [f.name];
+  if (code) parts.push(code);
+  if (!NO_NAME.includes(pKey) && pl.name) parts.push(pl.name);
+  return { s, code, type: pl.type, title: parts.join(' ') };
+}
+const speakTitle = (fKey, pKey) => {
+  const c = callInfo(fKey, pKey);
+  return c.code ? c.title.replace(c.code, c.code[0] + ' ' + c.code.slice(1)) : c.title;
+};
+
+/* ---------- Where everybody stands ---------- */
+function layout(f) {
+  const s = f.te === 'R' ? 1 : -1;
+  const seS = f.se === 'R' ? 1 : -1;
+  const P = {};
+  P.line = [['T', -104], ['G', -52], ['C', 0], ['G', 52], ['T', 104]]
+    .map(([label, dx]) => ({ label, x: CX + dx, y: LOS, kind: 'line' }));
+  P.TE = { label: 'TE', x: CX + s * 156, y: LOS, kind: 'end' };
+  P.SE = { label: 'SE', x: CX + seS * 262, y: LOS, kind: 'end' };
+  P.b1 = { label: '1', x: CX, y: LOS + 34, kind: 'back', rot: 0 };
+  P.b3 = { label: '3', x: CX, y: LOS + FB_DEPTH, kind: 'back', rot: 0 };
+  const near = { x: CX + s * 170, y: LOS + 32, rot: -s * 45, kind: 'back' };
+  const far = f.type === 'twins'
+    ? { x: CX - s * 190, y: LOS + 36, rot: 0, kind: 'back' }        // slot, inside the split end
+    : { x: CX - s * 120, y: LOS + FB_DEPTH, rot: 0, kind: 'back' };  // in line with the 3
+  if (s === 1) { P.b2 = { label: '2', ...near }; P.b4 = { label: '4', ...far }; }
+  else         { P.b4 = { label: '4', ...near }; P.b2 = { label: '2', ...far }; }
+  P.near = s === 1 ? P.b2 : P.b4;
+  P.far  = s === 1 ? P.b4 : P.b2;
+  return { P, s };
+}
+
+/* ---------- Holes (x offsets from the center) ---------- */
+function holeMap(s) {
+  const H = { 0: 12, 1: -12, 2: 34, 3: -34, 4: 78, 5: -78 };
+  if (s === 1) { H[6] = 130; H[8] = 216; H[9] = -158; }
+  else         { H[7] = -130; H[9] = -216; H[8] = 158; }
+  return H;
+}
+
+/* ---------- Route makers ---------- */
+/* d = path so far, start = last point of d, tail = extra straight points */
+function R(owner, from, style, d, start, tail, dirOverride) {
+  let px = start[0], py = start[1], ux = 0, uy = -1;
+  tail.forEach(([x, y]) => {
+    d += ` L${x},${y}`;
+    const dx = x - px, dy = y - py, l = Math.hypot(dx, dy) || 1;
+    ux = dx / l; uy = dy / l; px = x; py = y;
+  });
+  if (dirOverride) { ux = dirOverride[0]; uy = dirOverride[1]; }
+  return { owner, from, style, d, end: { x: px, y: py, ux, uy } };
+}
+/* A blocker takes a short 45-degree step toward the hole to gain position,
+   then drives forward and pushes the man away from the hole. */
+function angBlock(owner, p, dir, fwd, len) {
+  const step = 12, a0 = Math.PI / 4, a = 0.66;
+  const sx = p.x - dir * step * Math.sin(a0), sy = p.y - step * Math.cos(a0);
+  const x1 = sx, y1 = sy - fwd;
+  const x2 = x1 + dir * len * Math.sin(a), y2 = y1 - len * Math.cos(a);
+  const d = fwd
+    ? `M${p.x},${p.y} C${sx},${sy} ${x1},${y1} ${x2},${y2}`
+    : `M${p.x},${p.y} C${sx},${sy} ${sx},${sy} ${x2},${y2}`;
+  return R(owner, p, 'block', d, [x2, y2], [], [dir * Math.sin(a), -Math.cos(a)]);
+}
+function passBlockR(owner, p, len) {
+  return R(owner, p, 'block', `M${p.x},${p.y}`, [p.x, p.y], [[p.x, p.y - len]]);
+}
+function passR(owner, from, p0, p1) {
+  const l = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) || 1;
+  return { owner, from, style: 'pass', d: `M${p0[0]},${p0[1]} L${p1[0]},${p1[1]}`,
+           end: { x: p1[0], y: p1[1], ux: (p1[0] - p0[0]) / l, uy: (p1[1] - p0[1]) / l } };
+}
+
+/* ---------- Build a whole play ---------- */
+function buildPlay(fKey, pKey) {
+  const f = FORM[fKey], { P, s } = layout(f);
+  const X = dx => CX + s * dx, q = (dx, y) => `${X(dx)},${y}`;
+  const H = holeMap(s), HA = k => CX + H[k];
+  const near = P.near, far = P.far, nid = s === 1 ? 'b2' : 'b4', fid = s === 1 ? 'b4' : 'b2';
+  const sOut = s === 1 ? 8 : 9, wOut = s === 1 ? 9 : 8, dS = s === 1 ? 0 : 1, dW = s === 1 ? 1 : 0;
+  const strongW = sideWord(s), weakW = sideWord(-s);
+  const routes = [], marks = [];
+  let roles = {}, targets = {}, rows = {}, carrier = null, hole = null, hint = '';
+  const add = r => (routes.push(r), r);
+  const hT = k => ({ x: HA(k), y: HR_Y, hole: String(k) });
+  const eT = r => ({ x: r.end.x, y: r.end.y, hole: null });
+  const row = (id, ball, title, text) => { rows[id] = { id, ball, title, text }; };
+  const nOf = id => id.replace('b', '');
+  function pt(dx, y) { return [X(dx), y]; }
+  const step45 = (p, dir) => [p.x - dir * 12 * Math.SQRT1_2, p.y - 12 * Math.SQRT1_2];
+
+  // the 4's sweep-out run: flat and long, passing right through the 3's own starting spot,
+  // then a sharp hook up to the hole only at the very end
+  const arcD = endDx => `M${q(-120, LOS + FB_DEPTH)} C${q(-70, LOS + FB_DEPTH + 2)} ${q(20, LOS + FB_DEPTH - 2)} ${q(110, LOS + FB_DEPTH - 8)} C${q(endDx - 40, LOS + 72)} ${q(endDx, LOS + 40)} ${q(endDx, LOS)}`;
+  const centerBlock = hx => {
+    const c = P.line[2], dir = seal(c.x, hx);
+    const y1 = c.y - 62, x2 = c.x + dir * 34 * Math.sin(0.66), y2 = y1 - 34 * Math.cos(0.66);
+    return add(R('L', c, 'block', `M${c.x},${c.y} C${c.x},${y1} ${c.x},${y1} ${x2},${y2}`, [x2, y2], [], [dir * Math.sin(0.66), -Math.cos(0.66)]));
+  };
+  const lineBlocks = hx => {
+    P.line.forEach(p => { if (p.label !== 'C') add(angBlock('L', p, seal(p.x, hx), 14, 34)); });
+    centerBlock(hx);
+    add(angBlock('TE', P.TE, seal(P.TE.x, hx), 20, 34));
+    add(angBlock('SE', P.SE, seal(P.SE.x, hx), 20, 34));
+  };
+  const passLine = () => P.line.forEach(p => add(passBlockR('L', p, 20)));
+  // near back's own quick block: one smooth curve, no hitches
+  const nearBlock = hx => {
+    const dir = seal(near.x, hx);
+    const ex = near.x + dir * 22, ey = near.y - 60;
+    const d = `M${near.x},${near.y} C${near.x + dir * 4},${near.y - 28} ${ex - dir * 6},${ey + 18} ${ex},${ey}`;
+    return add(R(nid, near, 'block', d, [ex, ey], [], [dir * 0.5, -1]));
+  };
+  // the 3's block: one smooth curve out to where the near back started, then blocks upfield from there
+  const fbBlock = hx => {
+    const dir = seal(near.x, hx);
+    const ex = near.x + dir * 18, ey = near.y - 48;
+    const d = `M${P.b3.x},${P.b3.y} C${P.b3.x + dir * 90},${P.b3.y + 4} ${near.x - dir * 30},${near.y + 10} ${ex},${ey}`;
+    return add(R('b3', P.b3, 'block', d, [ex, ey], [], [dir * 0.4, -1]));
+  };
+  const sweeperBlock = (hx, endDx) => {
+    const dir = seal(X(endDx), hx);
+    const ex = X(endDx) + dir * 21, ey = 318;
+    const d = arcD(endDx) + ` L${X(endDx)},345 C${X(endDx)},345 ${X(endDx)},345 ${ex},${ey}`;
+    return add(R(fid, far, 'block', d, [ex, ey], [], [dir * Math.sin(0.66), -Math.cos(0.66)]));
+  };
+  const linemenRow = text => row('OL', false, 'Blocks', text);
+
+  // a tight hitch toward the strong side, then one wide continuous boot out toward the sideline,
+  // crossing the LOS just inside the split end (holes 8/9 don't need to be hit exactly on the nose)
+  const bootWide = -230;
+  const bootD = `M${q(0, 414)} C${q(24, 422)} ${q(-168, 438)} ${q(bootWide, 380)}`;
+
+  // a wide, single-radius arc that sweeps through the QB-to-4 handoff spot and continues left
+  const sweepLoopR = 74, sweepFlag = s > 0 ? 1 : 0;
+  const qbSweepD = `M${q(0, 414)} A${sweepLoopR},${sweepLoopR} 0 0,${sweepFlag} ${q(-148, 414)}`;
+
+  switch (pKey) {
+    case 'diveS': case 'diveW': {
+      const hk = pKey === 'diveS' ? dS : dW, hx = HA(hk);
+      lineBlocks(hx);
+      add(R('b3', P.b3, 'ball', `M${P.b3.x},${P.b3.y}`, [P.b3.x, P.b3.y], [[hx, LOS], [hx, TD_Y + 26]]));
+      const nb = nearBlock(hx);
+      sweeperBlock(hx, 216);
+      marks.push({ x: P.b3.x + (hx - P.b3.x) * 0.49, y: LOS + 66 });
+      roles = { b1: 'hand', b3: 'ball', [nid]: 'block', [fid]: 'block', TE: 'block', SE: 'block' };
+      targets = { b3: hT(hk), [nid]: eT(nb), [fid]: hT(sOut) };
+      carrier = 'b3'; hole = hk;
+      hint = `The QB hands off to the 3. The 3 dives to the ${hk} hole.`;
+      row('b1', false, 'Hands off', 'Hands off to the 3');
+      row(nid, false, 'Blocks', `Straight ahead, sealing ${sideWord(seal(near.x, hx))}, away from the ${hk} hole`);
+      row('b3', true, 'Gets the ball', `Dives straight to the ${hk} hole`);
+      row(fid, false, 'Blocks', `Runs right through where the 3 started, around to the ${sOut} hole, then blocks`);
+      row('TE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.TE.x, hx))}`);
+      row('SE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.SE.x, hx))}`);
+      linemenRow(`Step toward the hole, then seal away from the ${hk} hole. The C goes up to the linebackers.`);
+      break;
+    }
+    case 'sweep': {
+      const hx = HA(sOut);
+      lineBlocks(hx);
+      const nb = nearBlock(hx);
+      fbBlock(hx);
+      const qbEnd = [X(-148) - s * 6, 388];
+      const qb = add(R('b1', P.b1, 'run', qbSweepD + ` L${qbEnd[0]},${qbEnd[1]}`, qbEnd, [], [-s * 0.25, -0.97]));
+      marks.push({ x: X(-64), y: 480 });
+      add(R(fid, far, 'ball', arcD(216), [X(216), LOS], [[X(216), TD_Y + 26]]));
+      roles = { b1: 'fake', [fid]: 'ball', [nid]: 'block', b3: 'block', TE: 'block', SE: 'block' };
+      targets = { b1: eT(qb), [nid]: eT(nb), b3: hT(sOut), [fid]: hT(sOut) };
+      carrier = fid; hole = sOut;
+      hint = `The QB sweeps wide to hand to the ${nOf(fid)} as their paths cross, then keeps faking. The ${nOf(fid)} runs right through where the 3 started, to the ${sOut} hole.`;
+      row('b1', false, 'Fakes', `Sweeps wide to the ${weakW}, handing to the ${nOf(fid)} as their paths cross, then keeps faking`);
+      row(nid, false, 'Blocks', `Straight ahead, sealing ${weakW} so the ${nOf(fid)} can get around the ${strongW}`);
+      row('b3', false, 'Blocks', `Releases outside, rounds where the ${nOf(nid)} started, then blocks well upfield`);
+      row(fid, true, 'Gets the ball', `Runs right through where the 3 started, around to the ${sOut} hole`);
+      row('TE', false, 'Blocks', `Steps toward the hole, then seals ${weakW}`);
+      row('SE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.SE.x, hx))}`);
+      linemenRow(`Step toward the hole, then seal ${weakW} so the ball can get outside. The C goes up to the linebackers.`);
+      break;
+    }
+    case 'keep': {
+      const hx = HA(sOut);
+      lineBlocks(hx);
+      const nb = nearBlock(hx);
+      fbBlock(hx);
+      sweeperBlock(hx, 212);
+      const keepD = `M${q(0, 414)} C${q(-50, 436)} ${hx - s * 10},450 ${hx},380`;
+      add(R('b1', P.b1, 'ball', keepD, [hx, 380], [[hx, TD_Y + 26]]));
+      roles = { b1: 'ball', [nid]: 'block', b3: 'block', [fid]: 'block', TE: 'block', SE: 'block' };
+      targets = { b1: hT(sOut), [nid]: eT(nb), b3: hT(sOut), [fid]: hT(sOut) };
+      carrier = 'b1'; hole = sOut;
+      hint = `The QB drops back and to the ${weakW}, then swooshes around behind his blockers to the ${sOut} hole.`;
+      row('b1', true, 'Gets the ball', `Drops back and to the ${weakW} a step, then swooshes around behind his blockers, wide to the ${sOut} hole`);
+      row(nid, false, 'Blocks', `Straight ahead, sealing ${weakW} so the 1 can get around the ${strongW}`);
+      row('b3', false, 'Blocks', `Releases outside, rounds where the ${nOf(nid)} started, then blocks well upfield`);
+      row(fid, false, 'Blocks', `Runs right through where the 3 started, around to the ${sOut} hole, then blocks`);
+      row('TE', false, 'Blocks', `Steps toward the hole, then seals ${weakW}`);
+      row('SE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.SE.x, hx))}`);
+      linemenRow(`Step toward the hole, then seal ${weakW} so the ball can get outside. The C goes up to the linebackers.`);
+      break;
+    }
+    case 'boot': {
+      const hx = HA(wOut);
+      lineBlocks(hx);
+      const nb = nearBlock(hx);
+      fbBlock(hx);
+      sweeperBlock(hx, 216);
+      add(R('b1', P.b1, 'ball', bootD, [X(bootWide), 380], [[X(bootWide), TD_Y + 26]]));
+      roles = { b1: 'ball', [nid]: 'block', b3: 'block', [fid]: 'block', TE: 'block', SE: 'block' };
+      targets = { b1: hT(wOut), [nid]: eT(nb), b3: hT(sOut), [fid]: hT(sOut) };
+      carrier = 'b1'; hole = wOut;
+      hint = `The QB hitches toward the ${strongW}, then boots wide to the ${weakW}, out where the SE lines up, to the ${wOut} hole. The call says ${callInfo(fKey, pKey).code}, but the ball goes ${wOut}. Tricky!`;
+      row('b1', true, 'Gets the ball', `Hitches toward the ${strongW}, then boots wide to the ${weakW}, out where the SE lines up, to the ${wOut} hole. The call says ${callInfo(fKey, pKey).code}, but he goes ${wOut}!`);
+      row(nid, false, 'Blocks', `Straight ahead, sealing ${sideWord(seal(near.x, hx))} for the ${wOut} hole`);
+      row('b3', false, 'Blocks', `Releases outside, rounds where the ${nOf(nid)} started, then blocks well upfield`);
+      row(fid, false, 'Blocks', `Runs right through where the 3 started, to the ${sOut} hole, then finds a man to block`);
+      row('TE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.TE.x, hx))}`);
+      row('SE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.SE.x, hx))}`);
+      linemenRow(`Step toward the hole, then seal away from the ${wOut} hole. The C goes up to the linebackers.`);
+      break;
+    }
+    case 'reverse': {
+      const hx = HA(wOut);
+      lineBlocks(hx);
+      fbBlock(hx);
+      const b1End = [X(-148) - 16, 360];
+      add(R('b1', P.b1, 'block', qbSweepD + ` L${X(-148)},388 C${X(-148)},388 ${X(-148)},388 ${b1End[0]},${b1End[1]}`, b1End, [], [-0.5, -0.87]));
+      sweeperBlock(hx, 216);
+      const loopR2 = 260, revFlag = s > 0 ? 1 : 0;
+      const revD = `M${near.x},${near.y} A${loopR2},${loopR2} 0 0,${revFlag} ${hx},380`;
+      add(R(nid, near, 'ball', revD, [hx, 380], [[hx, TD_Y + 26]]));
+      roles = { b1: 'multi', [nid]: 'ball', b3: 'block', [fid]: 'multi', TE: 'block', SE: 'block' };
+      targets = { b1: hT(wOut), [nid]: hT(wOut), b3: hT(sOut), [fid]: hT(sOut) };
+      carrier = nid; hole = wOut;
+      hint = `The QB sweeps wide left to hand to the ${nOf(fid)}, who hands inside to the ${nOf(nid)}. The ${nOf(nid)} carries it in one smooth loop to the ${wOut} hole. The call says ${callInfo(fKey, pKey).code}, but it goes ${wOut}!`;
+      row('b1', false, 'Blocks', `Sweeps wide to the ${weakW}, handing to the ${nOf(fid)} as their paths cross, then blocks at the ${wOut} hole`);
+      row(nid, true, 'Gets the ball', `Takes the inside handoff from the ${nOf(fid)}, carries it in one smooth loop to the ${wOut} hole`);
+      row('b3', false, 'Blocks', `Releases outside, rounds where the ${nOf(nid)} started, then blocks well upfield`);
+      row(fid, false, 'Blocks', `Takes the handoff from the QB, hands inside to the ${nOf(nid)}, then runs through where the 3 started to the ${sOut} hole to block`);
+      row('TE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.TE.x, hx))}`);
+      row('SE', false, 'Blocks', `Steps toward the hole, then seals ${sideWord(seal(P.SE.x, hx))}`);
+      linemenRow(`Step toward the hole, then seal away from the ${wOut} hole. The C goes up to the linebackers.`);
+      break;
+    }
+    case 'dump': {
+      passLine();
+      const sg = Math.sign(P.SE.x - CX);
+      const qb = add(R('b1', P.b1, 'run', `M${P.b1.x},${P.b1.y}`, [P.b1.x, P.b1.y], [[P.b1.x, P.b1.y + 34]], [0, 1]));
+      add(R('TE', P.TE, 'ball', `M${P.TE.x},${P.TE.y}`, [P.TE.x, P.TE.y], [[P.TE.x, LOS - 140]]));
+      add(passR('b1', P.b1, [CX + s * 8, LOS + 60], [P.TE.x, LOS - 140]));
+      const flatEnd = f.se === f.te ? 200 : 252;
+      const nr = add(R(nid, near, 'run', `M${near.x},${near.y}`, [near.x, near.y], [pt(flatEnd, 376)]));
+      const fbr = add(R('b3', P.b3, 'block', `M${P.b3.x},${P.b3.y} C${X(20)},${P.b3.y - 20} ${X(40)},${P.b3.y - 50} ${X(36)},410`, [X(36), 410], [], [0.3, -1]));
+      const far_ = add(R(fid, far, 'block', `M${far.x},${far.y} C${X(-20)},${far.y - 20} ${X(-40)},${far.y - 50} ${X(-36)},410`, [X(-36), 410], [], [-0.3, -1]));
+      const se = add(R('SE', P.SE, 'run', `M${P.SE.x},${P.SE.y}`, [P.SE.x, P.SE.y], [[P.SE.x - sg * 70, 310]]));
+      roles = { b1: 'pass', TE: 'ball', SE: 'fake', [nid]: 'fake', b3: 'block', [fid]: 'block' };
+      targets = { b1: eT(qb), TE: { x: P.TE.x, y: LOS - 140, hole: null }, SE: eT(se), [nid]: eT(nr), b3: eT(fbr), [fid]: eT(far_) };
+      carrier = 'TE'; hole = null;
+      hint = 'Quick pass to the TE, straight ahead, 7 yards deep.';
+      row('b1', false, 'Passes', 'Short drop back, quick pass. Reads the TE first, then the 2, then the SE');
+      row(nid, false, 'Runs a route', `Shallow angle to the ${strongW} flat`);
+      row('b3', false, 'Blocks', `Joins the linemen in pass protection blocking`);
+      row(fid, false, 'Blocks', `Joins the linemen in pass protection blocking`);
+      row('TE', true, 'Gets the ball', 'Straight ahead, 7 yards, then turns to catch the pass');
+      row('SE', false, 'Runs a route', 'Slant: 45 degrees toward the middle');
+      linemenRow('Pass block at the line. Nobody goes downfield.');
+      break;
+    }
+    case 'screen': {
+      passLine();
+      add(passBlockR('TE', P.TE, 20));
+      const sg = Math.sign(P.SE.x - CX);
+      const catchX = P.SE.x, catchY = P.SE.y - 40;
+      add(passR('b1', P.b1, [P.b1.x + sg * 10, P.b1.y - 6], [catchX, catchY]));
+      add(R('SE', P.SE, 'ball', `M${P.SE.x},${P.SE.y}`, [P.SE.x, P.SE.y], [[catchX, catchY]]));
+      const nr = add(R(nid, near, 'block', `M${near.x},${near.y}`, [near.x, near.y], [[near.x + s * 22, near.y - 44]]));
+      // 3 runs a wide flat route to the strong side, staying clear of the line
+      const flatX = X(210), flatY = LOS + 28;
+      const fbr = add(R('b3', P.b3, 'run', `M${P.b3.x},${P.b3.y} C${X(60)},${P.b3.y + 8} ${X(150)},${P.b3.y + 4} ${flatX},${flatY}`, [flatX, flatY], [], [s * 0.9, -0.2]));
+      // far back sprints out in front of the SE before turning to block
+      const tx = P.SE.x - sg * 30, same = Math.sign(far.x - CX) === sg;
+      const sprint = same
+        ? `M${far.x},${far.y} C${far.x + (tx - far.x) * 0.2},468 ${tx + (far.x - tx) * 0.06},420 ${tx},345`
+        : `M${far.x},${far.y} C${far.x + (tx - far.x) * 0.25},462 ${far.x + (tx - far.x) * 0.75},466 ${tx},420 C${tx},395 ${tx},365 ${tx},345`;
+      const sp = add(R(fid, far, 'block', sprint, [tx, 345], [[tx, 298]]));
+      roles = { b1: 'pass', SE: 'ball', [nid]: 'block', b3: 'fake', [fid]: 'block', TE: 'block' };
+      targets = { [nid]: eT(nr), b3: eT(fbr), [fid]: eT(sp), SE: { x: catchX, y: catchY, hole: null } };
+      carrier = 'SE'; hole = null;
+      hint = `Quick pass to the SE right away, just 2 yards deep. The ${nOf(fid)} sprints out in front of him to block.`;
+      row('b1', false, 'Passes', 'Throws a quick pass to the SE right away');
+      row(nid, false, 'Blocks', 'Pass blocks at the line of scrimmage');
+      row('b3', false, 'Runs a route', `Runs a pass route to the ${strongW} flat, ensuring the pass is forward from the QB`);
+      row(fid, false, 'Blocks', `Sprints out in front of the SE, then turns to block after the catch`);
+      row('TE', false, 'Blocks', 'Pass blocks at the line');
+      row('SE', true, 'Gets the ball', `Takes two steps up, catches the quick pass, then follows the ${nOf(fid)}'s block`);
+      linemenRow('Pass block at the line. Nobody goes downfield.');
+      break;
+    }
+    case 'screenTw': {
+      passLine();
+      const sg = Math.sign(far.x - CX);
+      add(passR('b1', P.b1, [P.b1.x + sg * 16, far.y], [far.x - sg * 46, far.y]));
+      add(R(fid, far, 'ball', `M${far.x},${far.y}`, [far.x, far.y], [[far.x, TD_Y + 26]]));
+      const seDir = Math.sign(P.SE.x - far.x);
+      // SE cuts a few yards ahead of the slot catch and blocks for the receiver
+      const seEnd = [far.x + seDir * 16, far.y - 50];
+      const sb = add(R('SE', P.SE, 'block', `M${P.SE.x},${P.SE.y} C${P.SE.x},${far.y - 20} ${seEnd[0] - seDir * 8},${seEnd[1] + 24} ${seEnd[0]},${seEnd[1]}`, seEnd, [], [seDir * 0.35, -0.94]));
+      const te = add(R('TE', P.TE, 'run', `M${P.TE.x},${P.TE.y}`, [P.TE.x, P.TE.y], [[P.TE.x, 300]]));
+      const nr = add(R(nid, near, 'block', `M${near.x},${near.y}`, [near.x, near.y], [[near.x + s * 22, near.y - 44]]));
+      const fbr = add(R('b3', P.b3, 'block', `M${P.b3.x},${P.b3.y}`, [P.b3.x, P.b3.y], [pt(104, 398)]));
+      roles = { b1: 'pass', [fid]: 'ball', TE: 'fake', SE: 'block', [nid]: 'block', b3: 'block' };
+      targets = { [nid]: eT(nr), b3: eT(fbr), [fid]: { x: far.x, y: 300, hole: null }, TE: eT(te), SE: eT(sb) };
+      carrier = fid; hole = null;
+      hint = `Quick pass to the ${nOf(fid)} in the slot. The SE gets out in front of him, then blocks.`;
+      row('b1', false, 'Passes', `Throws a quick pass to the ${nOf(fid)} right away`);
+      row(nid, false, 'Blocks', 'In the wing. Pass blocks');
+      row('b3', false, 'Blocks', `Comes up, pass protects right behind the linemen`);
+      row(fid, true, 'Gets the ball', 'In the slot, a couple yards off the line. Catches the quick pass, then follows the SE\'s block');
+      row('TE', false, 'Runs a route', 'Straight ahead like TE Dump');
+      row('SE', false, 'Blocks', `Gets out in front of the ${nOf(fid)} first, then blocks the cornerback`);
+      linemenRow('Pass block at the line. Nobody goes downfield.');
+      break;
+    }
+  }
+  const info = callInfo(fKey, pKey);
+  info.carrier = carrier; info.hole = hole; info.hint = hint;
+  info.carrierLabel = carrier === 'TE' || carrier === 'SE' ? carrier : (carrier ? carrier.replace('b', '') : '');
+  return { P, s, H, routes, marks, roles, targets, rows, info };
+}
+
+/* ---------- SVG pieces ---------- */
+function fieldSVG() {
+  let s = `<rect width="800" height="${FH}" fill="#fbfaff"/>`;
+  s += `<rect width="800" height="82" fill="#4c1d95"/>`;
+  s += `<text x="400" y="46" text-anchor="middle" font-family="Oswald,Impact,sans-serif" font-size="30" font-weight="700" letter-spacing="12" fill="#fff" opacity=".9">TOUCHDOWN</text>`;
+  s += `<rect y="79" width="800" height="5" fill="#22d65a"/>`;
+  [180, 280, 480, 580].forEach(y => s += `<path d="M10 ${y}H790" stroke="#ddd6ee" stroke-width="2"/>`);
+  s += `<path d="M10 ${LOS}H790" stroke="#8b5cf6" stroke-width="2.5" stroke-dasharray="10 8"/>`;
+  let h = '';
+  for (let y = 100; y <= FH; y += 20) h += `M189 ${y}h12M599 ${y}h12`;
+  s += `<path d="${h}" stroke="#c9bfe3" stroke-width="2"/>`;
+  [[180, '5'], [280, '10'], [380, '15'], [480, '20'], [580, '25']].forEach(([y, t]) => {
+    [100, 700].forEach(x => s += `<text x="${x}" y="${y}" dy=".35em" text-anchor="middle" font-family="Oswald,Impact,sans-serif" font-size="34" font-weight="700" fill="#cfc5e8" paint-order="stroke" stroke="#fbfaff" stroke-width="8">${t}</text>`);
+  });
+  s += `<rect width="10" height="${FH}" fill="#5b21b6"/><rect x="790" width="10" height="${FH}" fill="#5b21b6"/>`;
+  return s;
+}
+
+function playerSVG(p, glow) {
+  const r = p.kind === 'back' ? 17 : 15;
+  let g = '';
+  if (glow) g += `<circle cx="${p.x}" cy="${p.y}" r="${r + 8}" fill="#22d65a" fill-opacity=".28" stroke="#22d65a" stroke-width="4"/>`;
+  let fill = '#d8d4e3', stroke = '#2b2536', sw = 2.5, tc = '#17111f', fs = 17;
+  if (p.kind === 'end')  { fill = '#ffffff'; stroke = '#17111f'; sw = 3; fs = 14; }
+  if (p.kind === 'back') {
+    fill = '#6d28d9'; stroke = '#2e1065'; sw = 3; tc = '#fff'; fs = 21;
+    g += `<g transform="translate(${p.x} ${p.y}) rotate(${p.rot || 0})"><path d="M-7 ${-r + 2} L0 ${-r - 9} L7 ${-r + 2} Z" fill="#2e1065"/></g>`;
+  }
+  g += `<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  g += `<text x="${p.x}" y="${p.y}" dy=".35em" text-anchor="middle" font-family="Oswald,'Arial Narrow',Impact,sans-serif" font-weight="700" font-size="${fs}" fill="${tc}">${p.label}</text>`;
+  return g;
+}
+
+function routeSVG(r) {
+  const st = r.style, e = r.end, d = r.d;
+  const cfg = {
+    ball:  { col: '#22d65a', w: 7, dur: 1.3, delay: 0.35, len: 26, half: 17, edge: '#0c7a35' },
+    block: { col: '#2563eb', w: 5, dur: 0.8, delay: 0 },
+    run:   { col: '#6b7280', w: 5, dur: 0.9, delay: 0.15, len: 20, half: 12, edge: '#374151' },
+    pass:  { col: '#22d65a', w: 4, dur: 0.3, delay: 0.7, len: 20, half: 11, edge: '#0c7a35' }
+  }[st];
+  const px = -e.uy, py = e.ux;           // perpendicular to the last direction
+  let s = '';
+  if (st === 'pass') {
+    const cd = `--cd:${cfg.delay}s`;
+    s += `<path class="fade" d="${d}" fill="none" stroke="#fff" stroke-width="9" style="${cd}"/>`;
+    s += `<path class="fade" d="${d}" fill="none" stroke="${cfg.col}" stroke-width="${cfg.w}" stroke-dasharray="9 7" style="${cd}"/>`;
+  } else {
+    const sty = `--dur:${cfg.dur}s;--delay:${cfg.delay}s`;
+    s += `<path class="rt" d="${d}" pathLength="1" stroke="#fff" stroke-width="${cfg.w + 5}" style="${sty}"/>`;
+    s += `<path class="rt" d="${d}" pathLength="1" stroke="${cfg.col}" stroke-width="${cfg.w}" style="${sty}"/>`;
+  }
+  const cd2 = `--cd:${(cfg.delay + cfg.dur - 0.1).toFixed(2)}s`;
+  if (st === 'block') {
+    s += `<path class="endcap" style="${cd2}" d="M${e.x - px * 12},${e.y - py * 12}L${e.x + px * 12},${e.y + py * 12}" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>`;
+  } else {
+    const tipx = e.x + e.ux * cfg.len, tipy = e.y + e.uy * cfg.len;
+    const bx = e.x - e.ux * 6, by = e.y - e.uy * 6;
+    s += `<polygon class="endcap" style="${cd2}" points="${tipx},${tipy} ${bx + px * cfg.half},${by + py * cfg.half} ${bx - px * cfg.half},${by - py * cfg.half}" fill="${cfg.col}" stroke="${cfg.edge}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  }
+  return s;
+}
+
+function holeBadge(num, dx, target) {
+  const x = CX + dx, y = LOS - 64;
+  if (target) {
+    return `<circle cx="${x}" cy="${y}" r="12.5" fill="#22d65a" stroke="#0c7a35" stroke-width="3"/>` +
+           `<text x="${x}" y="${y}" dy=".35em" text-anchor="middle" font-family="Oswald,Impact,sans-serif" font-weight="700" font-size="17" fill="#06260f">${num}</text>`;
+  }
+  return `<g opacity=".9"><circle cx="${x}" cy="${y}" r="9" fill="#fff" stroke="#b3aac8" stroke-width="1.5"/>` +
+         `<text x="${x}" y="${y}" dy=".35em" text-anchor="middle" font-family="Oswald,Impact,sans-serif" font-weight="500" font-size="12" fill="#7d7396">${num}</text></g>`;
+}
+
+/* ---------- Quiz scene pieces ---------- */
+function xBadge(x, y) {
+  return `<circle cx="${x}" cy="${y}" r="10" fill="#111"/><path d="M${x - 4} ${y - 4}l8 8M${x + 4} ${y - 4}l-8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`;
+}
+
+function ringSVG(o) {
+  const { id, x, y, r, st, label } = o;
+  const lab = (fill, txt) => txt == null ? '' :
+    `<text x="${x}" y="${y}" dy=".35em" text-anchor="middle" font-family="Oswald,Impact,sans-serif" font-weight="700" font-size="${Math.round(r)}" fill="${fill}">${txt}</text>`;
+  if (st === 'idle') {
+    const attrs = o.choice === false ? '' : `data-choice="${id}" tabindex="0" role="button" aria-label="Choice"`;
+    return `<g ${attrs}><circle cx="${x}" cy="${y}" r="${r + 12}" fill="#fff" fill-opacity=".01"/>` +
+      `<circle class="rc blink" cx="${x}" cy="${y}" r="${r}" fill="#7c3aed" fill-opacity=".14" stroke="#7c3aed" stroke-width="3.5" stroke-dasharray="8 6"/>${lab('#5b21b6', '?')}</g>`;
+  }
+  if (st === 'ok') return `<circle cx="${x}" cy="${y}" r="${r}" fill="#22d65a" stroke="#0c7a35" stroke-width="3.5"/>${lab('#06260f', label)}`;
+  if (st === 'bad') return `<circle cx="${x}" cy="${y}" r="${r}" fill="#e5e7eb" stroke="#111" stroke-width="3.5"/>${lab('#6b647a', label)}${xBadge(x + r * .72, y - r * .72)}`;
+  return `<g opacity=".55"><circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="#9a92ad" stroke-width="2.5"/>${lab('#6b647a', label)}</g>`;
+}
+
+function tapRingSVG(p, id, st) {
+  const r = (p.kind === 'back' ? 17 : 15) + 12;
+  if (st === 'idle') {
+    return `<g data-choice="${id}" tabindex="0" role="button" aria-label="Player ${p.label}"><circle cx="${p.x}" cy="${p.y}" r="${r + 10}" fill="#fff" fill-opacity=".01"/>` +
+      `<circle class="rc blink" cx="${p.x}" cy="${p.y}" r="${r}" fill="none" stroke="#7c3aed" stroke-width="3.5" stroke-dasharray="8 6"/></g>`;
+  }
+  if (st === 'bad') return `<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="none" stroke="#111" stroke-width="3.5"/>${xBadge(p.x + r * .72, p.y - r * .72)}`;
+  return '';
+}
+
+function youMark(p) {
+  const r = p.kind === 'back' ? 17 : 15;
+  return `<circle cx="${p.x}" cy="${p.y}" r="${r + 8}" fill="none" stroke="#22d65a" stroke-width="5"/>` +
+    `<rect x="${p.x - 27}" y="${p.y + r + 8}" width="54" height="22" rx="11" fill="#2e1065"/>` +
+    `<text x="${p.x}" y="${p.y + r + 19}" dy=".35em" text-anchor="middle" font-family="Oswald,Impact,sans-serif" font-weight="700" font-size="15" fill="#fff">YOU</text>`;
+}
+
+/* One renderer for the play viewer and the quiz.
+   o: routes, marks, holes (show hole badges), target (hole label), autoGlow, omit, glow, you, tap, rings, mini, label */
+function sceneSVG(fKey, o = {}) {
+  const { P, s } = layout(FORM[fKey]);
+  const reg = { b1: P.b1, b2: P.b2, b3: P.b3, b4: P.b4, TE: P.TE, SE: P.SE };
+  const omit = o.omit || [], routes = o.routes || [], marks = o.marks || [];
+  const under = routes.filter(r => r.style === 'block' || r.style === 'run');
+  const over = routes.filter(r => r.style === 'ball' || r.style === 'pass');
+  const ballOwners = routes.filter(r => r.style === 'ball').map(r => r.owner);
+  const glow = (o.glow || []).concat(o.autoGlow ? ballOwners : []);
+  let out = `<svg viewBox="0 0 800 ${FH}" class="${o.mini ? 'static' : 'quiz'}" role="img" aria-label="${o.label || 'Formation'}">` + fieldSVG();
+  const H = holeMap(s);
+  if (o.holes) Object.keys(H).filter(k => k !== String(o.target)).forEach(k => out += holeBadge(k, H[k], false));
+  under.forEach(r => out += routeSVG(r));
+  P.line.forEach(p => out += playerSVG(p, false));
+  Object.keys(reg).forEach(k => { if (!omit.includes(k)) out += playerSVG(reg[k], glow.includes(k)); });
+  over.forEach(r => out += routeSVG(r));
+  const redraw = new Set(['b1']);
+  over.forEach(r => { if (reg[r.owner]) redraw.add(r.owner); });
+  redraw.forEach(k => { if (!omit.includes(k)) out += playerSVG(reg[k], glow.includes(k)); });
+  marks.forEach(m => {
+    out += `<circle class="endcap" style="--cd:.9s" cx="${m.x}" cy="${m.y}" r="7" fill="#22d65a" stroke="#fff" stroke-width="3"/><circle class="endcap" style="--cd:.9s" cx="${m.x}" cy="${m.y}" r="7" fill="none" stroke="#0c7a35" stroke-width="2"/>`;
+  });
+  if (o.holes && o.target != null && H[o.target] != null) out += holeBadge(o.target, H[o.target], true);
+  if (o.you) out += youMark(reg[o.you]);
+  if (o.tap) o.tap.ids.forEach(id => out += tapRingSVG(reg[id], id, o.tap.st(id)));
+  (o.rings || []).forEach(r => out += ringSVG(r));
+  return out + '</svg>';
+}
+
+function svgFor(fKey, pKey, opts = {}) {
+  const B = buildPlay(fKey, pKey);
+  return sceneSVG(fKey, { routes: B.routes, marks: B.marks, holes: opts.holes !== false, target: B.info.hole,
+                          autoGlow: true, mini: opts.mini, label: B.info.title });
+}
+
+function formationMiniSVG(fKey) {
+  const { P } = layout(FORM[fKey]);
+  const all = [...P.line, P.TE, P.SE, P.b1, P.b2, P.b3, P.b4];
+  let s = `<svg viewBox="100 296 600 270" role="img" aria-label="${FORM[fKey].name} formation"><rect x="100" y="296" width="600" height="270" fill="#fbfaff"/>`;
+  s += `<path d="M100 ${LOS}H700" stroke="#8b5cf6" stroke-width="2.5" stroke-dasharray="10 8"/>`;
+  all.forEach(p => s += playerSVG(p, false));
+  return s + '</svg>';
+}
+
+/* ---------- Huddle ---------- */
+const HS = {
+  b1: { label: '1',  x: 400, y: 150, kind: 'back', rot: 180 },
+  T1: { label: 'T',  x: 180, y: 290, kind: 'line' },
+  G1: { label: 'G',  x: 290, y: 290, kind: 'line' },
+  C:  { label: 'C',  x: 400, y: 290, kind: 'line' },
+  G2: { label: 'G',  x: 510, y: 290, kind: 'line' },
+  T2: { label: 'T',  x: 620, y: 290, kind: 'line' },
+  SE: { label: 'SE', x: 180, y: 410, kind: 'end' },
+  b4: { label: '4',  x: 290, y: 410, kind: 'back' },
+  b3: { label: '3',  x: 400, y: 410, kind: 'back' },
+  b2: { label: '2',  x: 510, y: 410, kind: 'back' },
+  TE: { label: 'TE', x: 620, y: 410, kind: 'end' }
+};
+const HINFO = {
+  b1: ['Quarterback (QB)', 'Stands in front. Back to the ball, facing the team.'],
+  b2: ['Right running back', 'Stands under the right guard.'],
+  b3: ['Fullback', 'Stands under the center.'],
+  b4: ['Left running back', 'Stands under the left guard.'],
+  C:  ['Center', 'Middle of the front row.'],
+  G1: ['Guard', 'Left of the center.'],
+  G2: ['Guard', 'Right of the center.'],
+  T1: ['Tackle', 'Left of the left guard.'],
+  T2: ['Tackle', 'Right of the right guard.'],
+  SE: ['Split end', 'Far left of the back row.'],
+  TE: ['Tight end', 'Far right of the back row.']
+};
+
+function ballIcon(x, y) {
+  return `<g transform="translate(${x} ${y}) rotate(-25)"><ellipse rx="30" ry="17" fill="#7c3aed" stroke="#2e1065" stroke-width="3"/><path d="M-12 0H12M-6 -6V6M0 -6V6M6 -6V6" stroke="#22d65a" stroke-width="3" stroke-linecap="round"/></g>`;
+}
+
+function hPlayerSVG(p, glow) {
+  const R = 34;
+  let g = '';
+  if (glow) g += `<circle cx="${p.x}" cy="${p.y}" r="${R + 9}" fill="#22d65a" fill-opacity=".28" stroke="#22d65a" stroke-width="5"/>`;
+  let fill = '#d8d4e3', stroke = '#2b2536', tc = '#17111f', wedge = '#2b2536', fs = 30;
+  if (p.kind === 'end')  { fill = '#fff'; stroke = '#17111f'; fs = 24; }
+  if (p.kind === 'back') { fill = '#6d28d9'; stroke = '#2e1065'; tc = '#fff'; wedge = '#2e1065'; fs = 36; }
+  g += `<g transform="translate(${p.x} ${p.y}) rotate(${p.rot || 0})"><path d="M-13 ${-R + 3} L0 ${-R - 15} L13 ${-R + 3} Z" fill="${wedge}"/></g>`;
+  g += `<circle cx="${p.x}" cy="${p.y}" r="${R}" fill="${fill}" stroke="${stroke}" stroke-width="3.5"/>`;
+  g += `<text x="${p.x}" y="${p.y}" dy=".35em" text-anchor="middle" font-family="Oswald,'Arial Narrow',Impact,sans-serif" font-weight="700" font-size="${fs}" fill="${tc}">${p.label}</text>`;
+  return g;
+}
+
+/* o.slots: state for the 4 back slots ('filled' | 'hidden' | 'ring' | 'mark' | 'ok' | 'bad')
+   o.info: taps show a name    o.sel: selected id */
+function huddleSVG(o = {}) {
+  const slots = o.slots || {};
+  let s = `<svg viewBox="0 0 800 480" class="quiz" role="img" aria-label="The huddle"><rect width="800" height="480" fill="#fbfaff"/>`;
+  s += ballIcon(400, 48) + `<text x="400" y="88" text-anchor="middle" font-family="Nunito,sans-serif" font-size="16" font-weight="800" fill="#a79fbe">ball</text>`;
+  const wrap = (id, inner) => o.info
+    ? `<g data-act="hpick" data-id="${id}" tabindex="0" role="button" aria-label="${HINFO[id][0]}">${inner}</g>` : inner;
+  ['T1', 'G1', 'C', 'G2', 'T2', 'SE', 'TE'].forEach(id => s += wrap(id, hPlayerSVG(HS[id], o.sel === id)));
+  ['b1', 'b4', 'b3', 'b2'].forEach(id => {
+    const st = slots[id] || 'filled', p = HS[id];
+    if (st === 'hidden') return;
+    if (st === 'ring') s += ringSVG({ id, x: p.x, y: p.y, r: 36, st: 'idle', label: '?' });
+    else if (st === 'mark') s += ringSVG({ id, x: p.x, y: p.y, r: 36, st: 'idle', choice: false });
+    else if (st === 'ok') s += hPlayerSVG(p, true);
+    else if (st === 'bad') s += hPlayerSVG(p, false) + xBadge(p.x + 26, p.y - 26);
+    else s += wrap(id, hPlayerSVG(p, o.sel === id));
+  });
+  return s + '</svg>';
+}
+
+
+/* ---------- Page UI ---------- */
+function ensureSel() {
+  if (!availFams().some(x => x.key === FORM[state.f].family)) { state.f = 'brown'; }
+  const list = playButtons(FORM[state.f].family);
+  if (!list.some(b => b.f === state.f && b.p === state.p)) { state.f = list[0].f; state.p = list[0].p; }
+}
+
+function controlsHTML() {
+  const pr = v => v ? 'true' : 'false';
+  let h = `<fieldset class="levels"><legend>Level</legend><div class="lvlrow">` +
+    LEVELS.map(l => `<label class="lvl ${state.mode === l.v ? 'on' : ''}"><input type="radio" name="lvl" value="${l.v}" ${state.mode === l.v ? 'checked' : ''}>` +
+      `<span><b>${l.name}</b><small>${l.desc}</small></span></label>`).join('') + `</div></fieldset>`;
+  const views = [['one', 'One play'], ['all', 'All Plays'], ['huddle', 'Huddle'], ['quiz', 'Quiz']];
+  h += `<div class="bar"><div class="seg" role="group" aria-label="View">` +
+    views.map(([v, t]) => `<button class="segbtn" data-act="view" data-v="${v}" aria-pressed="${pr(state.view === v)}">${t}</button>`).join('') + `</div>`;
+  if (state.view === 'one' || state.view === 'all')
+    h += `<button class="switch" data-act="holes" aria-pressed="${pr(state.holes)}"><span class="dot"></span>Hole numbers</button>`;
+  h += `</div>`;
+  if (state.view === 'one') {
+    const fam = FORM[state.f].family;
+    h += `<div class="tabs" role="group" aria-label="Formation">` +
+      availFams().map(x => `<button class="btn" data-act="fam" data-fam="${x.key}" aria-pressed="${pr(fam === x.key)}">${x.name}</button>`).join('') + `</div>`;
+    h += `<div class="tabs" role="group" aria-label="Play">` +
+      playButtons(fam).map(b => `<button class="btn" data-act="p" data-f="${b.f}" data-p="${b.p}" aria-pressed="${pr(state.f === b.f && state.p === b.p)}">${b.label}<small>${b.small}</small></button>`).join('') + `</div>`;
+  }
+  return h;
+}
+
+const legendHTML = `<div class="legend">
+  <span class="lg"><svg width="52" height="22" viewBox="0 0 52 22"><path d="M2 11H32" stroke="#22d65a" stroke-width="7"/><polygon points="30,2 50,11 30,20" fill="#22d65a" stroke="#0c7a35" stroke-width="2" stroke-linejoin="round"/></svg>Gets the ball</span>
+  <span class="lg"><svg width="52" height="22" viewBox="0 0 52 22"><path d="M2 11H42" stroke="#2563eb" stroke-width="5"/><path d="M43 2V20" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/></svg>Blocks</span>
+  <span class="lg"><svg width="52" height="22" viewBox="0 0 52 22"><path d="M2 11H32" stroke="#6b7280" stroke-width="5"/><polygon points="30,3 48,11 30,19" fill="#6b7280" stroke="#374151" stroke-width="2" stroke-linejoin="round"/></svg>Runs, no ball</span>
+  <span class="lg"><svg width="52" height="22" viewBox="0 0 52 22"><path d="M2 11H34" stroke="#22d65a" stroke-width="4" stroke-dasharray="7 5"/><polygon points="32,4 48,11 32,18" fill="#22d65a" stroke="#0c7a35" stroke-width="2" stroke-linejoin="round"/></svg>Pass</span>
+  <span class="lg"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" fill="#22d65a" stroke="#0c7a35" stroke-width="2.5"/></svg>Handoff</span>
+  <span class="lg"><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="#d8d4e3" stroke="#2b2536" stroke-width="2.5"/></svg>Lineman</span>
+  <span class="lg"><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="#fff" stroke="#17111f" stroke-width="3"/></svg>End</span>
+  <span class="lg"><svg width="32" height="34" viewBox="0 0 32 34"><path d="M9 11L16 1L23 11Z" fill="#2e1065"/><circle cx="16" cy="19" r="12" fill="#6d28d9" stroke="#2e1065" stroke-width="3"/></svg>Back (point = facing)</span>
+</div>`;
+
+function assignmentsHTML(B) {
+  return ['b1', 'b2', 'b3', 'b4', 'TE', 'SE', 'OL'].filter(id => B.rows[id]).map(id => {
+    const r = B.rows[id];
+    const kind = id === 'OL' ? 'line' : (id === 'TE' || id === 'SE') ? 'end' : 'back';
+    const lab = id === 'OL' ? 'OL' : id.replace('b', '');
+    return `<div class="asg ${r.ball ? 'ball' : ''}"><span class="num ${kind}">${lab}</span><p><b>${r.title}</b>${r.text}</p></div>`;
+  }).join('');
+}
+
+function oneHTML() {
+  const B = buildPlay(state.f, state.p), info = B.info;
+  const run = info.type === 'run';
+  return `<section class="card">
+    <div class="callhead">
+      <h2>${info.title}</h2>
+      <div class="chips">
+        <div class="chip word"><b>${FORM[state.f].name}</b><i>Formation</i></div>
+        ${run ? `<div class="chip"><b>2</b><i>Series</i></div>` : `<div class="chip word"><b>Pass</b><i>Type</i></div>`}
+        <div class="chip"><b>${info.carrierLabel}</b><i>${run ? 'Ball' : 'Catches'}</i></div>
+        ${run ? `<div class="chip"><b>${info.hole}</b><i>Hole</i></div>` : ''}
+        <button class="replay" data-act="replay" aria-label="Replay the animation">Replay</button>
+      </div>
+    </div>
+    <div class="field">${sceneSVG(state.f, { routes: B.routes, marks: B.marks, holes: state.holes, target: info.hole, autoGlow: true, label: info.title })}</div>
+    ${legendHTML}
+  </section>
+  <section class="card">
+    <h3>Who does what</h3>
+    <div class="asg-grid">${assignmentsHTML(B)}</div>
+  </section>`;
+}
+
+function allHTML() {
+  return availFams().map(fm => `
+    <section class="fgroup">
+      <h3>${fm.name}</h3>
+      <div class="row3">
+        ${playButtons(fm.key).map(b => {
+          const c = callInfo(b.f, b.p);
+          return `<button class="mini" data-act="open" data-f="${b.f}" data-p="${b.p}" aria-label="Open ${c.title}">
+            <span class="mt">${c.title}</span>
+            <span class="fieldwrap">${svgFor(b.f, b.p, { mini: true, holes: state.holes })}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </section>`).join('') + `<div class="card">${legendHTML}</div>`;
+}
+
+/* =====================  QUIZ  ===================== */
+const quiz = { meter: 0, q: null, answered: false, picked: null, right: false, msg: '',
+               justFilled: false, celebrate: false, deck: [], last: null };
+const QTYPES = ['huddleStand', 'huddleWho', 'stand', 'whoBall', 'ballOrBlock', 'holeCall', 'tapHole', 'go', 'picture', 'name'];
+
+function pickHoles(H, correctKey, n) {
+  const chosen = [correctKey];
+  shuffle(Object.keys(H).filter(k => k !== correctKey)).forEach(k => {
+    if (chosen.length < n && chosen.every(c => Math.abs(H[c] - H[k]) >= 46)) chosen.push(k);
+  });
+  return chosen;
+}
+function holeRing(H, k, st, showLabel) { return { id: k, x: CX + H[k], y: HR_Y, r: 19, st, label: showLabel ? k : null }; }
+
+function standSpots(P, x) {
+  const t = P['b' + x];
+  const others = [...P.line, P.TE, P.SE].concat(['b1', 'b2', 'b3', 'b4'].filter(k => k !== 'b' + x).map(k => P[k]));
+  const near = side => ({ x: CX + side * 170, y: LOS + 32 });
+  const far = side => ({ x: CX + side * 120, y: LOS + FB_DEPTH });
+  const slot = side => ({ x: CX + side * 190, y: LOS + 36 });
+  let pool;
+  if (x === 1) pool = [{ x: CX, y: LOS + 78 }, { x: CX - 64, y: LOS + 34 }, { x: CX + 64, y: LOS + 34 }];
+  else {
+    pool = [near(1), near(-1), far(1), far(-1)];
+    if (state.mode >= 3) pool.push(slot(1), slot(-1));
+    if (x === 3) pool.push({ x: CX, y: LOS + 78 });
+  }
+  const apart = (a, b, d) => Math.hypot(a.x - b.x, a.y - b.y) > d;
+  const chosen = [];
+  shuffle(pool).forEach(p => {
+    if (chosen.length < 3 && apart(p, t, 70) && others.every(o => apart(p, o, 34)) && chosen.every(c => apart(p, c, 70))) chosen.push(p);
+  });
+  return [{ id: 'ok', x: t.x, y: t.y }].concat(chosen.map((p, i) => ({ id: 'd' + i, x: p.x, y: p.y })));
+}
+
+const HOLE_HINT = {
+  0: '0 is up the middle, on the center\'s right leg.', 1: '1 is up the middle, on the center\'s left leg.',
+  2: '2 is between the center and the right guard.', 3: '3 is between the center and the left guard.',
+  4: '4 is between the right guard and right tackle.', 5: '5 is between the left guard and left tackle.',
+  6: '6 is between the right tackle and the TE.', 7: '7 is between the left tackle and the TE.',
+  8: '8 is outside the line on the right.', 9: '9 is outside the line on the left.'
+};
+const FORM_HINT = {
+  brown: 'Brown: TE on the right, SE on the left.',
+  brownOver: 'Brown Over: TE and SE are both on the right.',
+  leftBrown: 'Left Brown: TE on the left, SE on the right.',
+  leftBrownOver: 'Left Brown Over: TE and SE are both on the left.',
+  twinsL: 'Twins Left: TE on the right, SE on the left. The 4 is in the slot, inside the SE.',
+  twinsR: 'Twins Right: TE on the left, SE on the right. The 2 is in the slot, inside the SE.'
+};
+const HUDDLE_HINT = {
+  1: 'The QB stands in front, facing the team.', 2: 'The 2 stands under the right guard.',
+  3: 'The 3 stands under the center.', 4: 'The 4 stands under the left guard.'
+};
+const labOf = id => id.replace('b', '');
+
+const GEN = {};
+
+GEN.huddleStand = () => {
+  const x = pick([1, 2, 3, 4]), id = 'b' + x;
+  return {
+    ask: 'Where do you stand?', speak: `In the huddle, you are the ${x} back. Where do you stand?`,
+    main: () => 'Huddle', you: String(x), kind: 'svg', correct: id, hint: HUDDLE_HINT[x],
+    scene: c => {
+      const slots = {};
+      ['b1', 'b2', 'b3', 'b4'].forEach(k => slots[k] = c.answered ? (k === id ? 'ok' : k === c.picked ? 'bad' : 'filled') : 'ring');
+      return huddleSVG({ slots });
+    }
+  };
+};
+
+GEN.huddleWho = () => {
+  const x = pick([1, 2, 3, 4]), id = 'b' + x;
+  return {
+    ask: 'Who stands here?', speak: 'In the huddle, who stands in the spot with the question mark?',
+    main: () => 'Huddle', you: null, kind: 'svg', correct: String(x), hint: HUDDLE_HINT[x],
+    scene: c => {
+      const slots = {};
+      ['b1', 'b2', 'b3', 'b4'].forEach(k => slots[k] = k === id ? (c.answered ? 'ok' : 'mark') : 'hidden');
+      return huddleSVG({ slots });
+    },
+    buttons: [1, 2, 3, 4].map(n => ({ id: String(n), html: `<span class="num back big">${n}</span>` }))
+  };
+};
+
+GEN.stand = () => {
+  const fKey = pick(availForms()), x = pick([1, 2, 3, 4]), f = FORM[fKey];
+  const { P, s } = layout(f);
+  const spots = standSpots(P, x);
+  const nearNum = s === 1 ? 2 : 4;
+  const hint = x === 1 ? 'The 1 (QB) stands right behind the center.'
+    : x === 3 ? 'The 3 is 5 yards behind the QB.'
+    : x === nearNum ? `The ${x} is 1 yard behind the TE, angled in.`
+    : f.type === 'twins' ? `The ${x} is in the slot, inside the SE, a couple yards off the line.`
+    : `The ${x} lines up with the 3, behind the outside tackle.`;
+  return {
+    ask: 'Where do you stand?', speak: `${f.name}. You are the ${x} back. Where do you stand?`,
+    main: () => f.name, you: String(x), kind: 'svg', correct: 'ok', hint,
+    scene: c => sceneSVG(fKey, {
+      omit: c.answered ? [] : ['b' + x], glow: c.answered ? ['b' + x] : [],
+      rings: spots.filter(sp => c.answered ? (sp.id === c.picked && sp.id !== 'ok') : true)
+                  .map(sp => ({ ...sp, r: 22, st: c.answered ? 'bad' : 'idle' })),
+      label: `${f.name}: where does the ${x} back stand?`
+    })
+  };
+};
+
+GEN.whoBall = () => {
+  const { f: fKey, p: pKey } = pick(availPlays()), B = buildPlay(fKey, pKey), info = B.info;
+  const pass = info.type === 'pass', correct = info.carrier;
+  const ids = pass ? ['b1', 'b2', 'b3', 'b4', 'TE', 'SE'] : ['b1', 'b2', 'b3', 'b4'];
+  return {
+    ask: pass ? 'Who catches the ball?' : 'Who runs with the ball?',
+    speak: `${speakTitle(fKey, pKey)}. ${pass ? 'Who catches the ball?' : 'Who runs with the ball?'}`,
+    main: () => info.title, you: null, kind: 'svg', correct, hint: info.hint,
+    scene: c => sceneSVG(fKey, {
+      tap: { ids, st: id => !c.answered ? 'idle' : id === c.picked && id !== correct ? 'bad' : 'dim' },
+      routes: c.answered ? B.routes.filter(r => r.style === 'ball' || r.style === 'pass') : [],
+      marks: c.answered ? B.marks : [], glow: c.answered ? [correct] : [],
+      label: `${info.title}: who gets the ball?`
+    })
+  };
+};
+
+GEN.holeCall = () => {
+  const { f: fKey, p: pKey } = pick(availPlays().filter(x => PLAYS[x.p].type === 'run'));
+  const B = buildPlay(fKey, pKey), info = B.info, H = B.H, hole = String(info.hole);
+  const keys = shuffle(pickHoles(H, hole, 4));
+  return {
+    ask: 'Where does the ball go?', speak: `${speakTitle(fKey, pKey)}. What hole does the ball go to?`,
+    main: () => info.title, you: null, kind: 'svg', correct: hole, hint: info.hint,
+    scene: c => sceneSVG(fKey, {
+      glow: [info.carrier], routes: c.answered ? B.routes.filter(r => r.style === 'ball') : [], marks: c.answered ? B.marks : [],
+      rings: keys.map(k => holeRing(H, k, !c.answered ? 'idle' : k === hole ? 'ok' : k === c.picked ? 'bad' : 'dim', c.answered)),
+      label: `${info.title}: where does the ball go?`
+    })
+  };
+};
+
+GEN.tapHole = () => {
+  const fKey = pick(availForms().filter(k => FORM[k].type === 'brown'));
+  const { s } = layout(FORM[fKey]), H = holeMap(s);
+  const hole = pick(Object.keys(H));
+  const keys = shuffle(pickHoles(H, hole, 4));
+  return {
+    ask: 'Tap the hole', speak: `${FORM[fKey].name}. Tap the ${hole} hole.`,
+    main: () => `The <span class="digs"><span class="dig hl">${hole}</span></span> hole`, you: null, kind: 'svg', correct: hole,
+    hint: HOLE_HINT[hole],
+    scene: c => sceneSVG(fKey, {
+      rings: keys.map(k => holeRing(H, k, !c.answered ? 'idle' : k === hole ? 'ok' : k === c.picked ? 'bad' : 'dim', c.answered)),
+      label: `Tap the ${hole} hole`
+    })
+  };
+};
+
+GEN.go = () => {
+  const { f: fKey, p: pKey } = pick(availPlays()), B = buildPlay(fKey, pKey), info = B.info;
+  const ids = Object.keys(B.targets), x = pick(ids), mine = B.targets[x];
+  const cand = [{ key: 'k0', ...mine }];
+  const add = (t, key) => { if (cand.every(c => Math.hypot(c.x - t.x, c.y - t.y) >= 68)) cand.push({ key, ...t }); };
+  shuffle(ids.filter(i => i !== x)).forEach((i, n) => add(B.targets[i], 'k' + (n + 1)));
+  if (cand.length < 4) shuffle(Object.keys(B.H)).forEach(k => { if (cand.length < 4) add({ x: CX + B.H[k], y: HR_Y, hole: k }, 'h' + k); });
+  if (cand.length < 3) add({ x: 2 * CX - mine.x, y: mine.y, hole: null }, 'mir');
+  const order = shuffle(cand);
+  const lab = labOf(x);
+  const text = B.rows[x] ? B.rows[x].text : '';
+  const stOf = (c, a) => !a.answered ? 'idle' : c.key === 'k0' ? 'ok' : c.key === a.picked ? 'bad' : 'dim';
+  return {
+    ask: 'Where do you go?', speak: `${speakTitle(fKey, pKey)}. You are the ${lab === 'TE' ? 'T E' : lab === 'SE' ? 'S E' : lab + ' back'}. Where do you go?`,
+    main: () => info.title, you: lab, kind: 'svg', correct: 'k0', hint: `The ${lab}: ${text}.`,
+    scene: c => sceneSVG(fKey, {
+      you: x, routes: c.answered ? B.routes.filter(r => r.owner === x) : [],
+      rings: order.map(cd => ({ id: cd.key, x: cd.x, y: cd.y, r: 20, st: stOf(cd, c),
+                                label: c.answered ? (cd.hole != null ? cd.hole : (cd.key === 'k0' ? '&#10003;' : null)) : null })),
+      label: `${info.title}: you are the ${lab}. Where do you go?`
+    })
+  };
+};
+
+GEN.ballOrBlock = () => {
+  const { f: fKey, p: pKey } = pick(availPlays()), B = buildPlay(fKey, pKey), info = B.info;
+  const ids = Object.keys(B.roles).filter(id => ['ball', 'block', 'fake'].includes(B.roles[id]));
+  const x = pick(ids), role = B.roles[x], lab = labOf(x);
+  const hasFake = Object.values(B.roles).includes('fake');
+  const arrow = `<svg width="84" height="30" viewBox="0 0 84 30" aria-hidden="true"><path d="M3 15H54" stroke="#22d65a" stroke-width="9"/><polygon points="50,2 80,15 50,28" fill="#22d65a" stroke="#0c7a35" stroke-width="3" stroke-linejoin="round"/></svg>`;
+  const cap = `<svg width="84" height="30" viewBox="0 0 84 30" aria-hidden="true"><path d="M3 15H70" stroke="#2563eb" stroke-width="7"/><path d="M72 3V27" stroke="#2563eb" stroke-width="7" stroke-linecap="round"/></svg>`;
+  const gray = `<svg width="84" height="30" viewBox="0 0 84 30" aria-hidden="true"><path d="M3 15H54" stroke="#6b7280" stroke-width="7"/><polygon points="50,3 80,15 50,27" fill="#6b7280" stroke="#374151" stroke-width="3" stroke-linejoin="round"/></svg>`;
+  const buttons = [{ id: 'ball', html: `${arrow}<span>Ball</span>` }, { id: 'block', html: `${cap}<span>Block</span>` }];
+  if (hasFake) buttons.push({ id: 'fake', html: `${gray}<span>Run, no ball</span>` });
+  const who = lab === 'TE' || lab === 'SE' ? lab : `${lab} back`;
+  const hint = role === 'ball' ? `The ${lab} gets the ball on ${info.title}.`
+    : role === 'block' ? `The ${lab} blocks on this play.` : `The ${lab} runs a route or a fake. No ball.`;
+  return {
+    ask: hasFake ? 'What is your job?' : 'Ball or block?',
+    speak: `${speakTitle(fKey, pKey)}. You are the ${who}. ${hasFake ? 'What is your job?' : 'Do you get the ball, or do you block?'}`,
+    main: () => info.title, you: lab, kind: 'svg', correct: role, hint,
+    scene: c => sceneSVG(fKey, {
+      you: x, routes: c.answered ? B.routes.filter(r => r.owner === x) : [],
+      label: `${info.title}: you are the ${lab}. What is your job?`
+    }),
+    buttons
+  };
+};
+
+GEN.picture = () => {
+  const forms = availForms(), fKey = pick(forms);
+  const opts = shuffle([fKey].concat(shuffle(forms.filter(k => k !== fKey)).slice(0, 3)));
+  return {
+    ask: 'Tap the picture', speak: `${FORM[fKey].name}. Tap the picture that matches.`,
+    main: () => FORM[fKey].name, you: null, kind: 'cards', correct: fKey, hint: FORM_HINT[fKey],
+    cards: opts.map(k => ({ id: k, svg: formationMiniSVG(k) }))
+  };
+};
+
+GEN.name = () => {
+  const forms = availForms(), fKey = pick(forms);
+  const opts = shuffle([fKey].concat(shuffle(forms.filter(k => k !== fKey)).slice(0, 3)));
+  return {
+    ask: 'Which formation?', speak: 'Which formation is this?',
+    main: () => 'Formation?', you: null, kind: 'pic', correct: fKey, hint: FORM_HINT[fKey],
+    pic: formationMiniSVG(fKey),
+    buttons: opts.map(k => ({ id: k, html: `<span>${FORM[k].name}</span>` }))
+  };
+};
+
+
+function huddleHTML() {
+  const sel = state.hpick;
+  const kindOf = id => HS[id].kind;
+  const infoBox = sel
+    ? `<span class="num ${kindOf(sel)}">${HS[sel].label}</span><p><b>${HINFO[sel][0]}</b>${HINFO[sel][1]}</p>`
+    : `<p><b>Tap a player</b>to see his name and spot.</p>`;
+  return `<section class="card">
+    <div class="callhead">
+      <h2>The huddle</h2>
+      <div class="chips">
+        <span class="pill">QB faces the team</span>
+        <span class="pill">Team faces the QB</span>
+        <span class="pill">In tight and quiet</span>
+      </div>
+    </div>
+    <div class="field qfield">${huddleSVG({ info: true, sel })}</div>
+    <div class="hinfo" aria-live="polite">${infoBox}</div>
+  </section>`;
+}
+
+
+function nextType() {
+  if (!quiz.deck.length) quiz.deck = shuffle(QTYPES.concat(['stand', 'whoBall', 'go', 'holeCall']));
+  let t = quiz.deck.pop();
+  if (t === quiz.last && quiz.deck.length) { const u = quiz.deck.shift(); quiz.deck.push(t); t = u; }
+  quiz.last = t;
+  return t;
+}
+
+function newQuestion() {
+  quiz.q = GEN[nextType()]();
+  quiz.answered = false; quiz.picked = null; quiz.right = false; quiz.justFilled = false;
+}
+
+const candyIds = { n: 0 };
+function candyCorn(size) {
+  const id = 'cc' + (++candyIds.n);
+  const shape = 'M30 3C34 3 37 8 39 14L57 56C61 65 55 68 48 68H12C5 68 -1 65 3 56L21 14C23 8 26 3 30 3Z';
+  return `<svg width="${size}" height="${Math.round(size * 1.15)}" viewBox="0 0 60 70" aria-hidden="true"><defs><clipPath id="${id}"><path d="${shape}"/></clipPath></defs>` +
+    `<g clip-path="url(#${id})"><rect width="60" height="26" fill="#fff"/><rect y="26" width="60" height="22" fill="#ff9f1c"/><rect y="48" width="60" height="24" fill="#ffd23f"/></g>` +
+    `<path d="${shape}" fill="none" stroke="#2e1065" stroke-width="2.5"/></svg>`;
+}
+
+function meterHTML() {
+  const m = quiz.meter;
+  let segs = '';
+  for (let i = 0; i < METER_GOAL; i++) segs += `<span class="mseg ${i < m ? 'on' : ''} ${i === m - 1 && quiz.justFilled ? 'new' : ''}" style="--i:${i}"></span>`;
+  return `<div class="meter ${m >= METER_GOAL ? 'full' : ''}" role="progressbar" aria-label="Quiz meter" aria-valuemin="0" aria-valuemax="${METER_GOAL}" aria-valuenow="${m}">
+    <div class="segs">${segs}</div><span class="prize">${candyCorn(36)}</span><span class="mcount">${m}/${METER_GOAL}</span></div>`;
+}
+
+const checkSVG = `<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="#06260f"/><path d="M12 24l8 8 15-17" fill="none" stroke="#22d65a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const crossSVG = `<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="#fff"/><path d="M15 15l16 16M31 15L15 31" stroke="#2b2536" stroke-width="5" stroke-linecap="round"/></svg>`;
+const speakerSVG = `<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 11h5l6-5v16l-6-5H4z" fill="currentColor"/><path d="M19 9c2 2 2 8 0 10M22 6c4 4 4 12 0 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+
+function feedbackHTML() {
+  if (!quiz.answered) return `<div class="fb idle"><span>Tap your answer</span></div>`;
+  const ok = quiz.right;
+  return `<div class="fb ${ok ? 'ok' : 'bad'}" aria-live="polite">
+    <span class="fbicon">${ok ? checkSVG : crossSVG}</span>
+    <div class="fbtxt"><b>${quiz.msg}</b><span>${quiz.q.hint}</span></div>
+    <button class="next" data-act="qnext">Next</button></div>`;
+}
+
+function choiceClass(base, id) {
+  let c = base;
+  if (quiz.answered) { if (id === quiz.q.correct) c += ' ok'; else if (id === quiz.picked) c += ' bad'; }
+  return c;
+}
+
+function confettiHTML() {
+  const cols = ['#7c3aed', '#ffffff', '#22d65a', '#a78bfa', '#111827'];
+  let h = '';
+  for (let i = 0; i < 46; i++) {
+    h += `<i style="left:${(Math.random() * 100).toFixed(1)}%;background:${cols[i % cols.length]};animation-duration:${(2.4 + Math.random() * 2.2).toFixed(2)}s;animation-delay:${(-Math.random() * 4).toFixed(2)}s;width:${(8 + Math.random() * 8).toFixed(0)}px;height:${(12 + Math.random() * 10).toFixed(0)}px"></i>`;
+  }
+  return h;
+}
+
+function winHTML() {
+  return `<div class="win" role="dialog" aria-label="You filled the meter">
+    <div class="confetti">${confettiHTML()}</div>
+    <svg class="flyball" width="100" height="62" viewBox="-50 -31 100 62" aria-hidden="true"><g transform="rotate(-25)"><ellipse rx="40" ry="22" fill="#fff" stroke="#22d65a" stroke-width="4"/><path d="M-16 0H16M-8 -8V8M0 -8V8M8 -8V8" stroke="#5b21b6" stroke-width="4" stroke-linecap="round"/></g></svg>
+    <div class="winbox">
+      <div class="td">TOUCHDOWN!</div>
+      <div class="candies">${candyCorn(84)}${candyCorn(104)}${candyCorn(84)}</div>
+      <div class="askcoach">${PRIZE_TEXT}</div>
+      <button class="next" data-act="qagain">Play again</button>
+    </div>
+  </div>`;
+}
+
+function quizHTML() {
+  if (!quiz.q) newQuestion();
+  const q = quiz.q, c = { answered: quiz.answered, picked: quiz.picked };
+  const canSpeak = 'speechSynthesis' in window;
+  let body = '';
+  if (q.kind === 'svg') body += `<div class="field qfield">${q.scene(c)}</div>`;
+  if (q.kind === 'pic') body += `<div class="field bigpic">${q.pic}</div>`;
+  if (q.kind === 'cards') {
+    body += `<div class="cards">` + q.cards.map(cd =>
+      `<button class="${choiceClass('cardbtn', cd.id)}" data-choice="${cd.id}" aria-label="${FORM[cd.id].name}">${cd.svg}</button>`).join('') + `</div>`;
+  }
+  if (q.buttons) {
+    body += `<div class="bigrow">` + q.buttons.map(b =>
+      `<button class="${choiceClass('bigbtn', b.id)}" data-choice="${b.id}">${b.html}</button>`).join('') + `</div>`;
+  }
+  return meterHTML() + `
+    <section class="card">
+      <div class="qhead">
+        <div class="qmain">${q.main(c)}</div>
+        ${q.you ? `<div class="you">You<span class="num ${/^\d$/.test(q.you) ? 'back' : 'end'}">${q.you}</span></div>` : ''}
+        <div class="qask"><span>${q.ask}</span>${canSpeak ? `<button class="speak" data-act="speak" aria-label="Read the question out loud">${speakerSVG}</button>` : ''}</div>
+      </div>
+      ${feedbackHTML()}
+      ${body}
+    </section>` + (quiz.celebrate ? winHTML() : '');
+}
+
+function answer(id) {
+  if (quiz.answered || !quiz.q) return;
+  quiz.answered = true; quiz.picked = id;
+  quiz.right = id === quiz.q.correct;
+  if (quiz.right) { quiz.meter++; quiz.justFilled = true; quiz.msg = pick(['Yes!', 'Nice!', 'You got it!', 'Great job!', 'Boom!']); }
+  else quiz.msg = 'Not quite';
+  render();
+  if (quiz.right && quiz.meter >= METER_GOAL) {
+    setTimeout(() => { quiz.celebrate = true; if (state.view === 'quiz') render(); }, 1500);
+  }
+}
+
+function speak(t) {
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t);
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  } catch (_) { /* speech not available */ }
+}
+
+
+/* ---------- Render + events ---------- */
+function render(keepScroll = true) {
+  const y = window.scrollY;
+  const body = state.view === 'one' ? oneHTML() : state.view === 'all' ? allHTML() : state.view === 'huddle' ? huddleHTML() : quizHTML();
+  document.getElementById('app').innerHTML = controlsHTML() + body;
+  if (keepScroll) window.scrollTo(0, y);
+}
+
+document.addEventListener('click', e => {
+  const ch = e.target.closest('[data-choice]');
+  if (ch && state.view === 'quiz') { answer(ch.dataset.choice); return; }
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const a = b.dataset.act;
+  let keep = true;
+  if (a === 'view') { state.view = b.dataset.v; if (state.view === 'quiz' && !quiz.q) newQuestion(); }
+  else if (a === 'fam') { state.f = b.dataset.fam === 'twins' ? 'twinsL' : b.dataset.fam; ensureSel(); }
+  else if (a === 'p') { state.f = b.dataset.f; state.p = b.dataset.p; }
+  else if (a === 'holes') state.holes = !state.holes;
+  else if (a === 'open') { state.f = b.dataset.f; state.p = b.dataset.p; state.view = 'one'; keep = false; }
+  else if (a === 'hpick') state.hpick = b.dataset.id;
+  else if (a === 'speak') { speak(quiz.q.speak); return; }
+  else if (a === 'qnext') newQuestion();
+  else if (a === 'qagain') { quiz.meter = 0; quiz.celebrate = false; newQuestion(); }
+  render(keep);
+  if (!keep) window.scrollTo({ top: 0 });
+});
+
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.tagName && e.target.tagName.toLowerCase() === 'g') {
+    if (e.target.dataset.choice && state.view === 'quiz') { e.preventDefault(); answer(e.target.dataset.choice); }
+    else if (e.target.dataset.act === 'hpick') { e.preventDefault(); state.hpick = e.target.dataset.id; render(); }
+  }
+});
+
+document.addEventListener('change', e => {
+  if (e.target && e.target.name === 'lvl') {
+    state.mode = +e.target.value; ensureSel(); quiz.q = null; quiz.celebrate = false; render();
+  }
+});
+
+ensureSel();
+render(false);
+</script>
+</body>
+</html>
